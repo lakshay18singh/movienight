@@ -15,8 +15,26 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+from django_registration.backends.activation.views import RegistrationView
+from movienight_auth.forms import RegistrationForm
+import movienight_auth.views
+import movies.views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path("admin/", admin.site.urls),
+    path("accounts/profile/", movienight_auth.views.profile, name="profile"),
+    path("accounts/register/", RegistrationView.as_view(form_class=RegistrationForm)),
+    path("accounts/",include("django_registration.backends.activation.urls")),
+    path("accounts/", include("django.contrib.auth.urls")),
+    path("", movies.views.index),
+    path("movie-nights/", movies.views.movie_night_list, name="movie_night_list_ui"),
+    path(
+        "movie-nights/<int:pk>/",
+        movies.views.movie_night_detail,
+        name="movie_night_detail_ui",
+    ),
+    path("search/", movies.views.movie_search, name="movie_search_ui"),
+    path("movies/<slug:imdb_id>/", movies.views.movie_detail, name="movie_detail_ui"),
 ]
+
