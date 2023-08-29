@@ -14,8 +14,8 @@ from pathlib import Path
 import os
 from configurations import Configuration
 
-class Dev(Configuration):
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+class Dev(Configuration):  
+    # Build paths inside the project like this: BASE_DIR / 'subdir'.
     BASE_DIR = Path(__file__).resolve().parent.parent
 
     # Quick-start development settings - unsuitable for production
@@ -46,23 +46,49 @@ class Dev(Configuration):
         "django.contrib.sessions",
         "django.contrib.messages",
         "django.contrib.staticfiles",
-        "movies",
+        "django_registration",
         "crispy_forms",
         "crispy_bootstrap5",
-        "django_registration",
+        "movies",
+        "rest_framework",
+        "rest_framework.authtoken",
+        "django_celery_results",
+        "django_celery_beat"
     ]
-    ACCOUNT_ACTIVATION_DAYS = 7
-    CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
-    CRISPY_TEMPLATE_PACK = "bootstrap5"
+    CELERY_RESULT_BACKEND = "django-db"
+    CELERY_BROKER_URL = "redis://localhost:6379/0"
+    REST_FRAMEWORK = {
+        "DEFAULT_PERMISSION_CLASSES": [
+            "rest_framework.permissions.IsAuthenticated",
+        ],
+        "DEFAULT_AUTHENTICATION_CLASSES": [
+            'rest_framework.authentication.BasicAuthentication',
+            'rest_framework.authentication.SessionAuthentication',
+            'rest_framework.authentication.TokenAuthentication',
+            'rest_framework_simplejwt.authentication.JWTAuthentication',
+        ],
+        "DEFAULT_PAGINATION_CLASS" : "rest_framework.pagination.PageNumberPagination",
+    }
+    LOGGING = {
+        "version": 1,
+        "disable_existing_loggers": False,
+        "handlers": {
+        "console": {"class": "logging.StreamHandler", "stream":"ext://sys.stdout"},
+        },
+        "root": {
+        "handlers": ["console"],
+        "level": "DEBUG",
+        }
+    }
 
     MIDDLEWARE = [
         "django.middleware.security.SecurityMiddleware",
         "django.contrib.sessions.middleware.SessionMiddleware",
         "django.middleware.common.CommonMiddleware",
-    #     "django.middleware.csrf.CsrfViewMiddleware",
+        "django.middleware.csrf.CsrfViewMiddleware",
         "django.contrib.auth.middleware.AuthenticationMiddleware",
         "django.contrib.messages.middleware.MessageMiddleware",
-    #     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+        "django.middleware.clickjacking.XFrameOptionsMiddleware",
     ]
 
     ROOT_URLCONF = "movienight.urls"
@@ -138,9 +164,18 @@ class Dev(Configuration):
 
     AUTH_USER_MODEL = "movienight_auth.User"
 
+    CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+    CRISPY_TEMPLATE_PACK = "bootstrap5"
+
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
-    BASE_URL = ""
+    ACCOUNT_ACTIVATION_DAYS = 7
+
+    BASE_URL = "https://rubystore-fictionmorris-8000.codio.io"
 
     OMDB_KEY = "42ea1d6f"
 
+    SIMPLE_JWT = {
+        "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
+        "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    }

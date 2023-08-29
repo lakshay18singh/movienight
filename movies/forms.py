@@ -1,11 +1,10 @@
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Submit
 from django import forms
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 
 from movies.models import MovieNight, MovieNightInvitation
-
-from crispy_forms.layout import Submit
-from crispy_forms.helper import FormHelper
 
 UserModel = get_user_model()
 
@@ -20,15 +19,20 @@ class MovieNightForm(forms.ModelForm):
         fields = ["start_time"]
 
     def __init__(self, *args, **kwargs):
-      super(MovieNightForm, self).__init__(*args, **kwargs)
-      self.helper = FormHelper()
-      self.helper.add_input(Submit('submit', 'Create'))
+        super(MovieNightForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.add_input(Submit("submit", "Create"))
 
 
 class InviteeForm(forms.Form):
     email = forms.EmailField()
 
     _user = False
+
+    def __init__(self, *args, **kwargs):
+        super(InviteeForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.add_input(Submit("submit", "Invite"))
 
     def clean_email(self):
         email = self.cleaned_data["email"]
@@ -39,11 +43,6 @@ class InviteeForm(forms.Form):
             raise ValidationError(f"User with email address '{email}' was not found.")
 
         return email
-    
-    def __init__(self, *args, **kwargs):
-      super(InviteeForm, self).__init__(*args, **kwargs)
-      self.helper = FormHelper()
-      self.helper.add_input(Submit('submit', 'Invite'))
 
 
 class AttendanceForm(forms.ModelForm):
@@ -55,4 +54,4 @@ class AttendanceForm(forms.ModelForm):
         super(AttendanceForm, self).__init__(*args, **kwargs)
         self.fields["is_attending"].label = "Attending?"
         self.helper = FormHelper()
-        self.helper.add_input(Submit('submit', 'Update Attendance'))
+        self.helper.add_input(Submit("submit", "Update Attendance"))
